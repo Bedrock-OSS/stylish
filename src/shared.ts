@@ -1,0 +1,1 @@
+export type ComponentCtor = { componentId: string; new (): any };
