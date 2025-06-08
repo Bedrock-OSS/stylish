@@ -10,7 +10,7 @@ export { BlockComponent } from "./blockRegistry";
  * Registers V1 `worldInitialize` event and registers all components.
  */
 export function initV1() {
-    world.beforeEvents.worldInitialize.subscribe((e) => {
+    (world as any).beforeEvents.worldInitialize.subscribe((e: any) => {
         registerAllComponents(e.itemComponentRegistry, e.blockComponentRegistry);
     });
 }
