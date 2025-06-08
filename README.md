@@ -14,6 +14,8 @@ npm install @bedrock-oss/stylish
 
 **Make sure to set `experimentalDecorators` to `true` in your `tsconfig.json` file.**
 
+This package requires Node.js 18 or higher.
+
 ## Usage
 
 
