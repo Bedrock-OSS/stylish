@@ -28,6 +28,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "lint": "eslint src --ext .ts",
     "test": "jest",
     "prepublishOnly": "npm run build"
   },
