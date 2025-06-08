@@ -12,6 +12,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
-    "allowUnusedLabels": true,
   }
 }
