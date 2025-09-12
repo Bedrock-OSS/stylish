@@ -1,26 +1,23 @@
-import { BlockComponentRegistry, ItemComponentRegistry, system, world } from "@minecraft/server";
+import { BlockComponentRegistry, ItemComponentRegistry, StartupEvent, system, world, WorldLoadAfterEvent } from "@minecraft/server";
 import { registerAllItemComponents } from "./itemRegistry";
 import { registerAllBlockComponents } from "./blockRegistry";
+import { triggerStartupEvent, triggerWorldLoadEvent } from "./eventRegistry";
 
 export { BindThis } from "./autobind";
 export { ItemComponent } from "./itemRegistry";
 export { BlockComponent } from "./blockRegistry";
+export { OnStartup, OnBeforeItemUse, OnWorldLoad, RegisterEvents, createEventDecorator } from "./eventRegistry";
 
 /**
- * Registers V1 `worldInitialize` event and registers all components.
+ * Initializes the library
  */
-export function initV1() {
-    (world as any).beforeEvents.worldInitialize.subscribe((e: any) => {
+export function init() {
+    system.beforeEvents.startup.subscribe((e: StartupEvent) => {
         registerAllComponents(e.itemComponentRegistry, e.blockComponentRegistry);
+        triggerStartupEvent(e);
     });
-}
-
-/**
- * Registers V2 `startup` event and registers all components.
- */
-export function initV2() {
-    (system as any).beforeEvents.startup.subscribe((e: any) => {
-        registerAllComponents(e.itemComponentRegistry, e.blockComponentRegistry);
+    world.afterEvents.worldLoad.subscribe((e: WorldLoadAfterEvent) => {
+        triggerWorldLoadEvent(e);
     });
 }
 

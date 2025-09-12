@@ -1,5 +1,6 @@
 import type { ItemComponentRegistry } from '@minecraft/server';
 import { ComponentCtor } from './shared';
+import { registerInstanceEventHandlers } from './eventRegistry';
 
 const registry: ComponentCtor[] = [];
 
@@ -20,9 +21,12 @@ export function registerAllItemComponents(
     itemComponentRegistry: ItemComponentRegistry
 ) {
     for (const Ctor of registry) {
+        const instance = new Ctor();
+        // Register any instance event handlers on this object
+        registerInstanceEventHandlers(instance);
         itemComponentRegistry.registerCustomComponent(
             Ctor.componentId,
-            new Ctor()
+            instance
         );
     }
 }

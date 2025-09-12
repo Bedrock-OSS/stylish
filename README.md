@@ -9,6 +9,10 @@ Stylish is a decorator library aimed at simplifying development for the Minecraf
 - `@ItemComponent` – automatically registers a custom item component.
 - `@BlockComponent` – automatically registers a custom block component.
 - `@BindThis` – binds a method to its instance when accessed.
+- `@OnStartup` – runs decorated methods when the pack starts.
+- `@OnWorldLoad` – runs decorated methods when the world is loaded.
+- `@OnBeforeItemUse` – runs decorated methods before item use (typed `ItemUseBeforeEvent`).
+- `@RegisterEvents` – auto-registers instance event methods (like `@OnStartup`) on construction.
 
 ## Installation
 
@@ -69,6 +73,7 @@ See the [`docs`](docs/) folder for details on decorators:
 - [BindThis](docs/bindthis.md)
 - [ItemComponent](docs/itemcomponent.md)
 - [BlockComponent](docs/blockcomponent.md)
+- [Events](docs/events.md)
 
 
 ## Contributing
