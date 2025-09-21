@@ -15,4 +15,4 @@ class ShapeComponent {
 ```
 
 Decorated classes will be registered with the `BlockComponentRegistry` when
-`initV1()` or `initV2()` executes.
+`init()` executes.
