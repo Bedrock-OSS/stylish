@@ -2,11 +2,13 @@ import { BlockComponentRegistry, ItemComponentRegistry, StartupEvent, system, wo
 import { registerAllItemComponents } from "./itemRegistry";
 import { registerAllBlockComponents } from "./blockRegistry";
 import { triggerStartupEvent, triggerWorldLoadEvent } from "./eventRegistry";
+import { registerAllCustomCommands } from "./customCommandRegistry";
 
 export { BindThis } from "./autobind";
 export { ItemComponent } from "./itemRegistry";
 export { BlockComponent } from "./blockRegistry";
 export { OnStartup, OnBeforeItemUse, OnWorldLoad, RegisterEvents, createEventDecorator } from "./eventRegistry";
+export { CustomCmd } from "./customCommandRegistry";
 
 /**
  * Initializes the library
@@ -14,6 +16,7 @@ export { OnStartup, OnBeforeItemUse, OnWorldLoad, RegisterEvents, createEventDec
 export function init() {
     system.beforeEvents.startup.subscribe((e: StartupEvent) => {
         registerAllComponents(e.itemComponentRegistry, e.blockComponentRegistry);
+        registerAllCustomCommands(e.customCommandRegistry);
         triggerStartupEvent(e);
     });
     world.afterEvents.worldLoad.subscribe((e: WorldLoadAfterEvent) => {
