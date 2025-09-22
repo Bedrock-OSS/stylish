@@ -54,11 +54,10 @@ class ExampleComponent {
 
 main.ts:
 ```ts
-import { initV1 } from '@bedrock-oss/stylish';
+import { init } from '@bedrock-oss/stylish';
 export * from './ExampleComponent';
 
-initV1(); // Registers all decorated components on world load
-// Replace with initV2() when using Script API v2
+init(); // Registers all decorated components and wires events
 // Alternatively, you can register your own event handler and call registerAllComponents()
 
 ```

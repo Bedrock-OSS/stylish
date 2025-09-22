@@ -2,6 +2,12 @@ import { RawMessage } from "@minecraft/server";
 
 jest.mock('@minecraft/server', () => {
   return {
+    CommandPermissionLevel: {
+      Any: 0,
+      GameMasters: 1,
+      Admin: 2,
+      Owner: 3,
+    },
     Direction: {
       Down: 'Down',
       East: 'East',

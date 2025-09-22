@@ -16,5 +16,5 @@ class CooldownComponent {
 }
 ```
 
-When `initV1()` or `initV2()` runs, every class decorated with `ItemComponent`
-will be registered with the appropriate `ItemComponentRegistry`.
+When `init()` runs, every class decorated with `ItemComponent` will be
+registered with the appropriate `ItemComponentRegistry`.
