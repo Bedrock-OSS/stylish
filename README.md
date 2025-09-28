@@ -8,6 +8,7 @@ Stylish is a decorator library aimed at simplifying development for the Minecraf
 
 - `@ItemComponent` – automatically registers a custom item component.
 - `@BlockComponent` – automatically registers a custom block component.
+- `@CustomCmd` - automatically registers a custom command.
 - `@BindThis` – binds a method to its instance when accessed.
 - `@OnStartup` – runs decorated methods when the pack starts.
 - `@OnWorldLoad` – runs decorated methods when the world is loaded.
@@ -23,7 +24,7 @@ npm install @bedrock-oss/stylish
 ```
 2. Enable decorators in your `tsconfig.json`:
 
-```jsonc
+```json
 {
   "compilerOptions": {
     "experimentalDecorators": true
@@ -72,6 +73,7 @@ See the [`docs`](docs/) folder for details on decorators:
 - [BindThis](docs/bindthis.md)
 - [ItemComponent](docs/itemcomponent.md)
 - [BlockComponent](docs/blockcomponent.md)
+- [CustomCmd](docs/customcommand.md)
 - [Events](docs/events.md)
 
 
