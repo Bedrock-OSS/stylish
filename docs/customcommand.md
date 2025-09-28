@@ -1,6 +1,6 @@
-# CustomCmd – Custom Command decorator
+# `CustomCmd`
 
-Attach `@CustomCmd` to a class implementing the Minecraft `CustomCommand` shape. On startup, Stylish will instantiate and register it with the runtime's `customCommandRegistry`, wiring your `run` handler.
+Attach `@CustomCmd` to a class implementing the Minecraft Script API `CustomCommand`. The class must either have a static or instance `run` method which will be invoked when the command is ran. 
 
 ## Example
 
@@ -29,5 +29,22 @@ class HelloCommand {
 }
 ```
 
-Decorated classes will be registered with the `CustomCommandRegistry` when
-`init()` executes.
+Decorated classes will be registered with the `CustomCommandRegistry` when `init()` executes.
+
+## Enum parameter registration
+
+If your command defines `mandatoryParameters` or `optionalParameters` with entries of type `Enum` that include a non-empty `values` array, stylish will automatically invoke `customCommandRegistry.registerEnum(name, values)` the first time it sees each enum name. Duplicate enum names (even if repeated across mandatory/optional arrays) are de-duplicated.
+
+Example:
+
+```ts
+readonly mandatoryParameters = [
+  {
+    name: "example:mode",
+    type: CustomCommandParamType.Enum,
+    values: ["on", "off"]
+  }
+];
+```
+
+No additional manual startup code is required for enum registration as it's built for streamlined use.
