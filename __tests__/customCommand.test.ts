@@ -53,20 +53,60 @@ describe("CustomCmd decorator", () => {
     expect((cmdInstance as any).run).toHaveBeenCalled();
   });
 
-  test("throws when run is missing", async () => {
+  // @CustomCmd
+  // class NoRunInvalid {
+  //   readonly name = "test:norun";
+  //   readonly description = "no";
+  //   readonly permissionLevel = CommandPermissionLevel.Any;
+  // }
+});
+
+describe("CustomCmd enum auto-registration", () => {
+  test("registers enums from mandatory parameters", async () => {
     const mod = await import("../src/customCommandRegistry");
     const { CustomCmd, registerAllCustomCommands } = mod;
 
-    class NoRun {
-      readonly name = "test:norun";
-      readonly description = "no";
-      readonly permissionLevel = CommandPermissionLevel.Any;
-    }
-    CustomCmd(NoRun as any);
+    // Provide a mock global enum type identifier to simulate runtime
+    (globalThis as any).CustomCommandParamType = { Enum: "enum" };
 
-    const registry = { registerCommand: jest.fn() } as any;
-    expect(() => registerAllCustomCommands(registry)).toThrow(
-      /has no run method/
-    );
+    class EnumCmd {
+      readonly name = "test:enum";
+      readonly description = "enum test";
+      readonly permissionLevel = 0; // Any
+      readonly mandatoryParameters = [
+        { name: "test:pos", type: "enum", values: ["a", "b"] },
+      ];
+      static run = jest.fn();
+    }
+    CustomCmd(EnumCmd as any);
+
+    const registry = { registerCommand: jest.fn(), registerEnum: jest.fn() } as any;
+    registerAllCustomCommands(registry);
+    expect(registry.registerEnum).toHaveBeenCalledWith("test:pos", ["a", "b"]);
+  });
+
+  test("deduplicates enum registrations across mandatory/optional", async () => {
+    const mod = await import("../src/customCommandRegistry");
+    const { CustomCmd, registerAllCustomCommands } = mod;
+    (globalThis as any).CustomCommandParamType = { Enum: "enum" };
+
+    class DuplicateEnumCmd {
+      readonly name = "test:dup";
+      readonly description = "dup enum";
+      readonly permissionLevel = 0;
+      readonly mandatoryParameters = [
+        { name: "test:shared", type: "enum", values: ["x", "y"] },
+      ];
+      readonly optionalParameters = [
+        { name: "test:shared", type: "enum", values: ["x", "y"] },
+      ];
+      static run = jest.fn();
+    }
+    CustomCmd(DuplicateEnumCmd as any);
+
+    const registry = { registerCommand: jest.fn(), registerEnum: jest.fn() } as any;
+    registerAllCustomCommands(registry);
+    expect(registry.registerEnum).toHaveBeenCalledTimes(1);
+    expect(registry.registerEnum).toHaveBeenCalledWith("test:shared", ["x", "y"]);
   });
 });

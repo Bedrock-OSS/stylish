@@ -8,6 +8,10 @@ jest.mock('@minecraft/server', () => {
       Admin: 2,
       Owner: 3,
     },
+    CustomCommandParamType: {
+      // Provide a symbolic value for Enum parameters; tests also accept string 'enum'
+      Enum: 'enum'
+    },
     Direction: {
       Down: 'Down',
       East: 'East',
