@@ -1,6 +1,6 @@
 {
   "name": "@bedrock-oss/stylish",
-  "version": "0.2.0",
+  "version": "0.0.4",
   "description": "A decorator package with for developing add-ons with Script API in Minecraft Bedrock Edition",
   "keywords": [
     "minecraft",
