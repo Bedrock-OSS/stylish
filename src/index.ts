@@ -1,13 +1,97 @@
-import { BlockComponentRegistry, ItemComponentRegistry, StartupEvent, system, world, WorldLoadAfterEvent } from "@minecraft/server";
-import { registerAllItemComponents } from "./itemRegistry";
-import { registerAllBlockComponents } from "./blockRegistry";
-import { triggerStartupEvent, triggerWorldLoadEvent } from "./eventRegistry";
-import { registerAllCustomCommands } from "./customCommandRegistry";
+import { BlockComponentRegistry, ItemComponentRegistry, StartupEvent, system } from "@minecraft/server";
+import { itemComponentCount, registerAllItemComponents } from "./itemRegistry";
+import { blockComponentCount, registerAllBlockComponents } from "./blockRegistry";
+import { triggerStartupEvent } from "./eventRegistry";
+import { customCommandCount, registerAllCustomCommands } from "./customCommandRegistry";
 
 export { BindThis } from "./autobind";
 export { ItemComponent } from "./itemRegistry";
 export { BlockComponent } from "./blockRegistry";
-export { OnStartup, OnBeforeItemUse, OnWorldLoad, RegisterEvents, createEventDecorator } from "./eventRegistry";
+export { Interval, Timeout, OnTick } from "./scheduler";
+export { WorldProperty, invalidateWorldProperty } from "./dynamicProperty";
+export type { WorldPropertyOptions } from "./dynamicProperty";
+export {
+    RegisterEvents,
+    createEventDecorator,
+    registerInstanceEventHandlers,
+    setEventDebugLogging,
+    ScriptEvent,
+    // System events
+    OnStartup,
+    OnBeforeShutdown,
+    OnScriptEventReceive,
+    // World after events
+    OnBlockContainerClosed,
+    OnBlockContainerOpened,
+    OnBlockExplode,
+    OnButtonPush,
+    OnDataDrivenEntityTrigger,
+    OnEffectAdd,
+    OnEntityContainerClosed,
+    OnEntityContainerOpened,
+    OnEntityDie,
+    OnEntityHeal,
+    OnEntityHealthChanged,
+    OnEntityHitBlock,
+    OnEntityHitEntity,
+    OnEntityHurt,
+    OnEntityItemDrop,
+    OnEntityItemPickup,
+    OnEntityLoad,
+    OnEntityRemove,
+    OnEntitySpawn,
+    OnEntityUpgrade,
+    OnExplosion,
+    OnGameRuleChange,
+    OnItemCompleteUse,
+    OnItemReleaseUse,
+    OnItemStartUse,
+    OnItemStartUseOn,
+    OnItemStopUse,
+    OnItemStopUseOn,
+    OnItemUse,
+    OnLeverAction,
+    OnPistonActivate,
+    OnPlayerBreakBlock,
+    OnPlayerButtonInput,
+    OnPlayerDimensionChange,
+    OnPlayerEmote,
+    OnPlayerGameModeChange,
+    OnPlayerHotbarSelectedSlotChange,
+    OnPlayerInputModeChange,
+    OnPlayerInputPermissionCategoryChange,
+    OnPlayerInteractWithBlock,
+    OnPlayerInteractWithEntity,
+    OnPlayerInventoryItemChange,
+    OnPlayerJoin,
+    OnPlayerLeave,
+    OnPlayerPlaceBlock,
+    OnPlayerSpawn,
+    OnPlayerSwingStart,
+    OnPressurePlatePop,
+    OnPressurePlatePush,
+    OnProjectileHitBlock,
+    OnProjectileHitEntity,
+    OnTargetBlockHit,
+    OnTripWireTrip,
+    OnWeatherChange,
+    OnWorldLoad,
+    // World before events
+    OnBeforeEffectAdd,
+    OnBeforeEntityHeal,
+    OnBeforeEntityHurt,
+    OnBeforeEntityItemPickup,
+    OnBeforeEntityRemove,
+    OnBeforeExplosion,
+    OnBeforeItemUse,
+    OnBeforePlayerBreakBlock,
+    OnBeforePlayerGameModeChange,
+    OnBeforePlayerInteractWithBlock,
+    OnBeforePlayerInteractWithEntity,
+    OnBeforePlayerLeave,
+    OnBeforeWeatherChange,
+} from "./eventRegistry";
+export type { EventMap, EventOptionsMap, EventDecorator } from "./eventRegistry";
 export { CustomCmd } from "./customCommandRegistry";
 
 /**
@@ -15,12 +99,12 @@ export { CustomCmd } from "./customCommandRegistry";
  */
 export function init() {
     system.beforeEvents.startup.subscribe((e: StartupEvent) => {
-        registerAllComponents(e.itemComponentRegistry, e.blockComponentRegistry);
-        registerAllCustomCommands(e.customCommandRegistry);
+        // The registry properties on the event are native accessors - only
+        // touch the ones that actually have decorated registrations.
+        if (itemComponentCount() > 0) registerAllItemComponents(e.itemComponentRegistry);
+        if (blockComponentCount() > 0) registerAllBlockComponents(e.blockComponentRegistry);
+        if (customCommandCount() > 0) registerAllCustomCommands(e.customCommandRegistry);
         triggerStartupEvent(e);
-    });
-    world.afterEvents.worldLoad.subscribe((e: WorldLoadAfterEvent) => {
-        triggerWorldLoadEvent(e);
     });
 }
 

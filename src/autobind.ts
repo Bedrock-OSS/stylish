@@ -1,5 +1,5 @@
 /**
- * Decorator – binds the method to the instance
+ * Decorator - binds the method to the instance
  * Equivalent to calling `this.method = this.method.bind(this);`
  */
 export function BindThis(

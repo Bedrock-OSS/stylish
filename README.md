@@ -6,14 +6,17 @@ Stylish is a decorator library aimed at simplifying development for the Minecraf
 
 ## Features
 
-- `@ItemComponent` – automatically registers a custom item component.
-- `@BlockComponent` – automatically registers a custom block component.
+- `@ItemComponent` - automatically registers a custom item component.
+- `@BlockComponent` - automatically registers a custom block component.
 - `@CustomCmd` - automatically registers a custom command.
-- `@BindThis` – binds a method to its instance when accessed.
-- `@OnStartup` – runs decorated methods when the pack starts.
-- `@OnWorldLoad` – runs decorated methods when the world is loaded.
-- `@OnBeforeItemUse` – runs decorated methods before item use (typed `ItemUseBeforeEvent`).
-- `@RegisterEvents` – auto-registers instance event methods (like `@OnStartup`) on construction.
+- `@BindThis` - binds a method to its instance when accessed.
+- `@OnStartup` - runs decorated methods when the pack starts.
+- `@OnWorldLoad` - runs decorated methods when the world is loaded.
+- `@On<Event>` / `@OnBefore<Event>` - a strongly typed decorator for every world/system event in `@minecraft/server` (e.g. `@OnPlayerJoin`, `@OnEntityDie`, `@OnBeforeItemUse`, `@OnScriptEventReceive`). Supports native filter options where the API does: `@OnEntityHurt({ entityTypes: ['example:boss'] })`. See [docs/events.md](docs/events.md) for the full list.
+- `@ScriptEvent('example:my_event')` - routes `/scriptevent` commands by id over a single namespace-filtered subscription.
+- `@Interval(ticks)` / `@Timeout(ticks)` / `@OnTick` - runs methods on a tick schedule, starting at startup.
+- `@WorldProperty('example:key', default)` - backs a class field with a world dynamic property (cached reads, write-through).
+- `@RegisterEvents` - auto-registers instance event methods (like `@OnStartup`) on construction.
 
 ## Installation
 

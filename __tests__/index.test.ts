@@ -28,35 +28,32 @@ describe("registerAllComponents", () => {
 });
 
 describe("init", () => {
-  test("subscribes to startup/worldLoad, registers components, and triggers events", () => {
+  test("subscribes to startup, registers components, and triggers events", () => {
     jest.isolateModules(() => {
       const startupEvent = {
         itemComponentRegistry: "i",
         blockComponentRegistry: "b",
       } as any;
-      const worldLoadEvent = { foo: "bar" } as any;
 
       const startupSubscribe = jest.fn((cb: any) => cb(startupEvent));
-      const worldLoadSubscribe = jest.fn((cb: any) => cb(worldLoadEvent));
 
       const mc = require("@minecraft/server");
       mc.system.beforeEvents = { startup: { subscribe: startupSubscribe } } as any;
-      mc.world.afterEvents = { worldLoad: { subscribe: worldLoadSubscribe } } as any;
 
       const mockItems = jest.fn();
       const mockBlocks = jest.fn();
       const mockTriggerStartup = jest.fn();
-      const mockTriggerWorldLoad = jest.fn();
 
       jest.doMock("../src/itemRegistry", () => ({
         registerAllItemComponents: mockItems,
+        itemComponentCount: () => 1,
       }));
       jest.doMock("../src/blockRegistry", () => ({
         registerAllBlockComponents: mockBlocks,
+        blockComponentCount: () => 1,
       }));
       jest.doMock("../src/eventRegistry", () => ({
         triggerStartupEvent: mockTriggerStartup,
-        triggerWorldLoadEvent: mockTriggerWorldLoad,
         OnStartup: jest.fn(),
         OnBeforeItemUse: jest.fn(),
         OnWorldLoad: jest.fn(),
@@ -68,11 +65,55 @@ describe("init", () => {
       index.init();
 
       expect(startupSubscribe).toHaveBeenCalled();
-      expect(worldLoadSubscribe).toHaveBeenCalled();
       expect(mockItems).toHaveBeenCalledWith("i");
       expect(mockBlocks).toHaveBeenCalledWith("b");
       expect(mockTriggerStartup).toHaveBeenCalledWith(startupEvent);
-      expect(mockTriggerWorldLoad).toHaveBeenCalledWith(worldLoadEvent);
+    });
+  });
+
+  test("skips native registry accessors when nothing is registered", () => {
+    jest.isolateModules(() => {
+      let itemAccessed = false;
+      let blockAccessed = false;
+      let commandAccessed = false;
+      const startupEvent = {} as any;
+      Object.defineProperty(startupEvent, "itemComponentRegistry", {
+        get() { itemAccessed = true; return "i"; },
+      });
+      Object.defineProperty(startupEvent, "blockComponentRegistry", {
+        get() { blockAccessed = true; return "b"; },
+      });
+      Object.defineProperty(startupEvent, "customCommandRegistry", {
+        get() { commandAccessed = true; return "c"; },
+      });
+
+      const mc = require("@minecraft/server");
+      mc.system.beforeEvents = {
+        startup: { subscribe: jest.fn((cb: any) => cb(startupEvent)) },
+      } as any;
+      mc.world.afterEvents = {} as any;
+      mc.world.beforeEvents = {} as any;
+
+      // Override the doMock factories left registered by the previous test
+      jest.doMock("../src/itemRegistry", () => ({
+        registerAllItemComponents: jest.fn(),
+        itemComponentCount: () => 0,
+      }));
+      jest.doMock("../src/blockRegistry", () => ({
+        registerAllBlockComponents: jest.fn(),
+        blockComponentCount: () => 0,
+      }));
+      jest.doMock("../src/customCommandRegistry", () => ({
+        registerAllCustomCommands: jest.fn(),
+        customCommandCount: () => 0,
+      }));
+
+      const index = require("../src/index");
+      index.init();
+
+      expect(itemAccessed).toBe(false);
+      expect(blockAccessed).toBe(false);
+      expect(commandAccessed).toBe(false);
     });
   });
 });

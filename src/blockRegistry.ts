@@ -5,13 +5,21 @@ import { registerInstanceEventHandlers } from './eventRegistry';
 const registry: ComponentCtor[] = [];
 
 /**
- * Decorator – attach to each component class to auto‐register it.
+ * Decorator - attach to each component class to auto-register it.
  */
 export function BlockComponent<T extends ComponentCtor>(ctor: T) {
     if (!ctor.componentId) {
         throw new Error(`Component ${ctor.name} is missing static componentId`);
     }
     registry.push(ctor);
+}
+
+/**
+ * Number of decorated block components awaiting registration.
+ * @internal
+ */
+export function blockComponentCount() {
+    return registry.length;
 }
 
 /**

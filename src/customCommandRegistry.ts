@@ -28,11 +28,19 @@ export type CustomCommandCtor = new () => StylishCustomCommand & Record<string, 
 const registry: CustomCommandCtor[] = [];
 
 /**
- * Decorator – attach to each Custom Command class to auto-register it.
+ * Decorator - attach to each Custom Command class to auto-register it.
  */
 export function CustomCmd<T extends CustomCommandCtor>(ctor: T): T {
   registry.push(ctor as CustomCommandCtor);
   return ctor;
+}
+
+/**
+ * Number of decorated custom commands awaiting registration.
+ * @internal
+ */
+export function customCommandCount() {
+  return registry.length;
 }
 
 /**
