@@ -29,12 +29,19 @@ export function registerAllItemComponents(
     itemComponentRegistry: ItemComponentRegistry
 ) {
     for (const Ctor of registry) {
-        const instance = new Ctor();
-        // Register any instance event handlers on this object
-        registerInstanceEventHandlers(instance);
-        itemComponentRegistry.registerCustomComponent(
-            Ctor.componentId,
-            instance
-        );
+        try {
+            const instance = new Ctor();
+            // Register any instance event handlers on this object
+            registerInstanceEventHandlers(instance);
+            itemComponentRegistry.registerCustomComponent(
+                Ctor.componentId,
+                instance
+            );
+        } catch (e) {
+            LOGGING: console.error(
+                `Failed to register item component '${Ctor.componentId}':`,
+                e
+            );
+        }
     }
 }

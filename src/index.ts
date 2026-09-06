@@ -101,9 +101,22 @@ export function init() {
     system.beforeEvents.startup.subscribe((e: StartupEvent) => {
         // The registry properties on the event are native accessors - only
         // touch the ones that actually have decorated registrations.
-        if (itemComponentCount() > 0) registerAllItemComponents(e.itemComponentRegistry);
-        if (blockComponentCount() > 0) registerAllBlockComponents(e.blockComponentRegistry);
-        if (customCommandCount() > 0) registerAllCustomCommands(e.customCommandRegistry);
+        // Blocks go first: a block JSON listing a flattened custom component fails
+        // to parse when that component is missing, so an unregistered block component
+        // costs a whole block, while items and commands only get a warning.
+        const sections: [() => number, () => void, string][] = [
+            [blockComponentCount, () => registerAllBlockComponents(e.blockComponentRegistry), "block components"],
+            [itemComponentCount, () => registerAllItemComponents(e.itemComponentRegistry), "item components"],
+            [customCommandCount, () => registerAllCustomCommands(e.customCommandRegistry), "custom commands"],
+        ];
+        for (const [count, register, label] of sections) {
+            if (count() === 0) continue;
+            try {
+                register();
+            } catch (err) {
+                LOGGING: console.error(`Failed to register ${label}:`, err);
+            }
+        }
         triggerStartupEvent(e);
     });
 }

@@ -69,6 +69,22 @@ init(); // Registers all decorated components and wires events
 > [!IMPORTANT]  
 > When splitting components into multiple files, remember to import/export the file containing the component class.
 
+## Stripping logs from production builds
+
+Every `console.*` call in stylish sits under a `LOGGING:` label. If you bundle
+with esbuild (directly, or through tools such as regolith filters that expose its
+options), you can drop all of the library's logging in one go:
+
+```js
+esbuild.build({
+  // ...
+  dropLabels: ["LOGGING"],
+});
+```
+
+You can use the same label in your own code to have it stripped together with
+the library's logs.
+
 ## Documentation
 
 See the [`docs`](docs/) folder for details on decorators:

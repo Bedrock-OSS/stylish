@@ -29,12 +29,22 @@ export function registerAllBlockComponents(
     blockComponentRegistry: BlockComponentRegistry
 ) {
     for (const Ctor of registry) {
-        const instance = new Ctor();
-        // Register any instance event handlers on this object
-        registerInstanceEventHandlers(instance);
-        blockComponentRegistry.registerCustomComponent(
-            Ctor.componentId,
-            instance
-        );
+        // A block whose JSON lists a flattened custom component fails to parse
+        // entirely when that component is missing - the block then does not exist
+        // in the world. One broken component must never take the others down.
+        try {
+            const instance = new Ctor();
+            // Register any instance event handlers on this object
+            registerInstanceEventHandlers(instance);
+            blockComponentRegistry.registerCustomComponent(
+                Ctor.componentId,
+                instance
+            );
+        } catch (e) {
+            LOGGING: console.error(
+                `Failed to register block component '${Ctor.componentId}':`,
+                e
+            );
+        }
     }
 }

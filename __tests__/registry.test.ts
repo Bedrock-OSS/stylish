@@ -57,3 +57,63 @@ describe("BlockComponent decorator", () => {
     );
   });
 });
+
+describe("registration isolation", () => {
+  test("a throwing item component does not stop the others", async () => {
+    jest.resetModules();
+    const mod = await import("../src/itemRegistry");
+    const { ItemComponent, registerAllItemComponents } = mod;
+
+    @ItemComponent
+    class Exploding {
+      static componentId = "foo:exploding";
+      constructor() {
+        throw new Error("boom");
+      }
+    }
+
+    @ItemComponent
+    class Fine {
+      static componentId = "foo:fine";
+    }
+
+    const registry = { registerCustomComponent: jest.fn() } as any;
+    const error = jest.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => registerAllItemComponents(registry)).not.toThrow();
+    expect(registry.registerCustomComponent).toHaveBeenCalledWith(
+      "foo:fine",
+      expect.any(Fine)
+    );
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  test("a throwing block component does not stop the others", async () => {
+    jest.resetModules();
+    const mod = await import("../src/blockRegistry");
+    const { BlockComponent, registerAllBlockComponents } = mod;
+
+    @BlockComponent
+    class ExplodingBlock {
+      static componentId = "foo:exploding_block";
+      constructor() {
+        throw new Error("boom");
+      }
+    }
+
+    @BlockComponent
+    class FineBlock {
+      static componentId = "foo:fine_block";
+    }
+
+    const registry = { registerCustomComponent: jest.fn() } as any;
+    const error = jest.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => registerAllBlockComponents(registry)).not.toThrow();
+    expect(registry.registerCustomComponent).toHaveBeenCalledWith(
+      "foo:fine_block",
+      expect.any(FineBlock)
+    );
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+});
