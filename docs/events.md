@@ -101,6 +101,22 @@ class Clock {
 
 Like event decorators, they work on static methods, instance methods (with `@RegisterEvents`), or as direct calls: `Interval(20)(fn)`.
 
+> [!WARNING]
+> The phase of an interval is arbitrary: `system.runInterval` first fires relative to the tick it was registered on, not to tick 0. Do not gate a slower rhythm inside the handler on `system.currentTick % n`. An `@Interval(4)` only ever visits a quarter of the residues mod `n`, and if the registration tick was not a multiple of 4, `system.currentTick % 12 === 0` is never true and the handler silently does nothing for the life of the world. Count down your own tick counter instead:
+>
+> ```ts
+> let fireworkTimer = 0;
+>
+> @Interval(4)
+> static fastTick() {
+>   fireworkTimer -= 4;
+>   if (fireworkTimer <= 0) {
+>     fireworkTimer = 12;
+>     launchFirework();
+>   }
+> }
+> ```
+
 ## `@WorldProperty`
 
 Backs a class field with a world dynamic property. Reads hit native `world.getDynamicProperty` once and are cached in JS afterwards; writes update the cache and write through natively. Declare the field **without an initializer** and pass the default to the decorator (a field initializer would overwrite the persisted value on every construction):

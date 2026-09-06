@@ -43,6 +43,14 @@ onStartupTriggered(() => {
  * fired. Instance methods (with `@RegisterEvents`) get one interval per
  * instance. The interval runs for the lifetime of the pack.
  *
+ * Phase: `system.runInterval` first fires relative to the tick it was
+ * registered on, so the interval's phase is arbitrary with respect to
+ * `system.currentTick`. Never gate a slower rhythm inside the handler on
+ * `system.currentTick % n` - an `@Interval(4)` only ever visits a quarter of
+ * the residues mod n, and if the registration tick was not itself a multiple
+ * of 4, `% 12 === 0` is never true and the handler silently does nothing for
+ * the life of the world. Count down your own tick counter instead.
+ *
  * ```ts
  * @Interval(20)
  * static everySecond() { ... }
@@ -68,7 +76,9 @@ export function Timeout(ticks: number): GenericDecorator {
 
 /**
  * Decorator - runs the decorated method (or directly registered function)
- * every tick. Equivalent to `@Interval(1)`.
+ * every tick. Equivalent to `@Interval(1)`. The first call lands on an
+ * arbitrary tick, so derive sub-rhythms from your own counter, not from
+ * `system.currentTick % n` (see {@link Interval}).
  */
 export const OnTick: GenericDecorator = makeDecorator((fn) =>
   schedule({ fn, ticks: 1, kind: "interval" })
